@@ -83,6 +83,7 @@ def list_diff_table(source_tbl, dest_tbl):
 
 def list_diff_table_field(source_tbl, dest_tbl):
     # 查询目标库中缺少表字段 然后拼接成sql 返回结果
+    tmp = list()
     diff_tbl_field = list()
     tbl = source_tbl.items()[0][0]
     source_tbl_field = list()
@@ -104,24 +105,24 @@ def list_diff_table_field(source_tbl, dest_tbl):
             # 查询出新增字段的前一个列名
             pos = source_tbl.items()[0][1].index(x)
             before_field = source_tbl.items()[0][1][pos - 1][0]
-            diff_tbl_field.append([x, before_field])
-    print diff_tbl_field
+            diff_tbl_field.append((tbl,x, before_field))
+    return diff_tbl_field
 
 
 def list_diff_table_field_x(source_tbl_field, dest_tbl_field):
-    dl = list()
+    diff_tbl = list()
     dx = dict()
+    #return list(set(source_tbl_field) - set(dest_tbl_field))
     for x in list(set(source_tbl_field) - set(dest_tbl_field)):
-        # print x[0], x[1], x[7]
-        dx.setdefault((x[0], x[1]), x[7])
-    dl.append(dx)
-    return dl
-
+        #print x[0], x[1], x[7]
+        if x[0] not in diff_tbl:
+            diff_tbl.append(x[0])
+    return diff_tbl
 
 if __name__ == '__main__':
     # 源库与目标库实例化对象
-    source_db = DB('192.168.137.11', 3376, 'root', '123456', 'test1')
-    dest_db = DB('192.168.137.11', 3376, 'root', '123456', 'test2')
+    source_db = DB('59.110.12.72', 3306, 'woniu', '123456', 'wuyongsheng14')
+    dest_db = DB('59.110.12.72', 3306, 'woniu', '123456', 'wuyongsheng140')
     source_tbl = source_db.list_table()
     dest_tbl = dest_db.list_table()
     if len(source_tbl) > len(dest_tbl):
@@ -136,12 +137,13 @@ if __name__ == '__main__':
         print "目标库比源库表多"
     else:
         print '源库与目标库表数量一致'
-
-    source_tbl_field = source_db.list_table_field_ddl('test1')
-    dest_tbl_field = dest_db.list_table_field_ddl('test2')
-    for col in list_diff_table_field_x(source_tbl_field, dest_tbl_field):
-        for tbl in col.items():
-            print tbl[0][0], tbl[1]
-            source_tbl_field = source_db.list_table_field(tbl[0][0])
-            dest_tbl_field = dest_db.list_table_field(tbl[0][0])
-            list_diff_table_field(source_tbl_field, dest_tbl_field)
+    
+    xtmp = list()
+    source_tbl_field = source_db.list_table_field_ddl('wuyongsheng14')
+    dest_tbl_field = dest_db.list_table_field_ddl('wuyongsheng140')
+    #list_diff_table_field_x(source_tbl_field, dest_tbl_field)
+    for tbl in list_diff_table_field_x(source_tbl_field, dest_tbl_field):
+        source_tbl_field = source_db.list_table_field(tbl)
+        dest_tbl_field = dest_db.list_table_field(tbl)
+        xtmp.append(list_diff_table_field(source_tbl_field, dest_tbl_field))
+    print xtmp
