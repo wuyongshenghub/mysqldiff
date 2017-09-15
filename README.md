@@ -1,0 +1,2 @@
+# auto_complete_diff_table_field
+比对不同数据库下表结构自动补齐
