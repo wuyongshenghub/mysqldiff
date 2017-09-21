@@ -63,8 +63,6 @@ class DB:
         return table_field
 
     def list_table_field_ddl(self, db_name):
-        # select column_name, data_type,is_nullable,column_type,column_key,extra,column_comment
-        # from information_schema.COLUMNS where table_name='ac_jianzhi' and table_schema='test1'
         sql = "select table_name,column_name,column_type, case is_nullable when 'NO' then 'NOT NULL' when 'YES' then 'NULL' end as is_nullable,case when column_default <> '' then column_default else 'NULL' end column_default ,extra,column_comment from information_schema.COLUMNS where table_schema='%s'" % (
             db_name)
         # print sql
